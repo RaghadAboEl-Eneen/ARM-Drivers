@@ -7,7 +7,7 @@
 
 #include "STD_TYPES.h"
 #include "BIT_MATH.h"
-
+#include "DELAY_interface.h"
 
 #include "GPIO_interface.h"
 #include "GPIO_register.h"
@@ -190,6 +190,48 @@ u8 GPIO_u8SetPortValue(u8 Copy_u8Port, u16 Copy_u16PortValue) {
 }
 
 
+u8 GPIO_u8SetPortSegmentValue(u8 Copy_u8Port, u16 Copy_u16PortValue, u8 Copy_u8StartPin, u8 Copy_u8NumberOfPins) {
+
+	u8 Local_u8ErrorState = OK;
+
+	u16 Copy_u16ODR_Mask = (0xFFFF >> (16-Copy_u8NumberOfPins));
+	Copy_u16PortValue &= Copy_u16ODR_Mask;
+
+	Copy_u16PortValue = Copy_u16PortValue << Copy_u8StartPin;
+
+	Copy_u16ODR_Mask = Copy_u16ODR_Mask << Copy_u8StartPin;
+
+	Copy_u16ODR_Mask = ~Copy_u16ODR_Mask;
+
+	switch (Copy_u8Port) {
+
+			case (GPIO_PORTA):
+			GPIO_PORTA_BASE->ODR &= Copy_u16ODR_Mask;
+			GPIO_PORTA_BASE->ODR |= Copy_u16PortValue;
+				break;
+
+			case (GPIO_PORTB):
+			GPIO_PORTB_BASE->ODR &= Copy_u16ODR_Mask;
+			GPIO_PORTB_BASE->ODR |= Copy_u16PortValue;
+
+				break;
+
+			case (GPIO_PORTC):
+			GPIO_PORTC_BASE->ODR &= Copy_u16ODR_Mask;
+			GPIO_PORTC_BASE->ODR |= Copy_u16PortValue;
+
+				break;
+
+			default:
+				Local_u8ErrorState = NOOK;
+				break;
+	}
+
+
+	return Local_u8ErrorState;
+
+
+}
 
 
 

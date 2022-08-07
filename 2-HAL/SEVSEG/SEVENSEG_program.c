@@ -7,6 +7,7 @@
 
 
 #include "STD_TYPES.h"
+#include "DELAY_interface.h"
 
 #include "RCC_interface.h"
 #include "GPIO_interface.h"
@@ -32,25 +33,61 @@ void SEVENSEG_voidInit() {
 
 	RCC_voidInit();
 	RCC_u8EnablePeripheralClock(GPIOA);
+	RCC_u8EnablePeripheralClock(GPIOB);
 	GPIO_u8SetPortMode(GPIO_PORTA, GPIO_PIN_MODE_GP_PP_10MHZ);
+	GPIO_u8SetPortMode(GPIO_PORTB, GPIO_PIN_MODE_GP_PP_10MHZ);
 
 }
 
-u8 SEVENSEG_u8DisplayNumber(u8 Copy_u8Number){
+u8 SEVENSEG_u8DisplayNumber(u8 Copy_u8Number, u8 Copy_u8SevenSegmentNumber){
 
 	u8 Local_u8ErrorState = OK;
 
-	GPIO_u8SetPortValue(SEVENSEG_PORT, sev_seg[Copy_u8Number]);
+	if(Copy_u8SevenSegmentNumber == GPIO_PORTA)
+		GPIO_u8SetPortSegmentValue(GPIO_PORTA, sev_seg[Copy_u8Number], 0, 7);
+	else if(Copy_u8SevenSegmentNumber == GPIO_PORTB)
+		GPIO_u8SetPortSegmentValue(GPIO_PORTB, sev_seg[Copy_u8Number], 5, 7);
+
 
 	return Local_u8ErrorState;
 
 }
 
 
-void SEVENSEG_voidTurnOffDisplay(void) {
+u8 SEVENSEG_u8CountDown(u8 Copy_u8Number) {
 
-	GPIO_u8SetPortValue(SEVENSEG_PORT, GPIO_PORT_LOW);
+	u8 Local_u8ErrorState = OK;
+
+	u8 Local_u8Counter = Copy_u8Number;
+
+	u8 Local_u8Temp = 0;
+
+	for(Local_u8Counter = Copy_u8Number; Local_u8Counter > 0; Local_u8Counter --) {
+
+		Local_u8Temp = Local_u8Counter % 10;
+		SEVENSEG_u8DisplayNumber(Local_u8Temp, SEVENSEGMENT2);
+		Local_u8Temp = Local_u8Counter / 10;
+		SEVENSEG_u8DisplayNumber(Local_u8Temp, SEVENSEGMENT1);
+		delay_ms(1500);
+	}
+
+
+	return Local_u8ErrorState;
+
+
 
 }
+
+
+
+
+void SEVENSEG_voidTurnOffDisplay(u8 Copy_u8SevenSegmentNumber) {
+
+	GPIO_u8SetPortSegmentValue(Copy_u8SevenSegmentNumber, GPIO_PORT_LOW, 0, 7);
+
+}
+
+
+
 
 
