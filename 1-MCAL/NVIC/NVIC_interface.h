@@ -2,13 +2,26 @@
  * NVIC_interface.h
  *
  *  Created on: Aug 8, 2022
- *      Author: Omar Gamal
+ *      Author:  es-RaghadAly2023
  */
 
 #ifndef NVIC_INTERFACE_H_
 #define NVIC_INTERFACE_H_
 
 
+#define		NVIC_GROUP_4_BITS		0x05FA0300
+#define		NVIC_GROUP_3_BITS		0x05FA0400
+#define		NVIC_GROUP_2_BITS		0x05FA0500
+#define		NVIC_GROUP_1_BITS		0x05FA0600
+#define		NVIC_GROUP_0_BITS		0x05FA0700
+
+
+/*
+ * NVIC_voidInit
+ * Parameters: void
+ * description: Sets the Priority Model for group & sub-priorities
+ */
+void NVIC_voidInit(void);
 
 /*
  * NVIC_voidEnableInterrupt
@@ -49,13 +62,7 @@ void NVIC_voidClearPendingFlag(u8 Copy_u8InterruptCode);
 u8 NVIC_u8GetActiveFlag(u8 Copy_u8InterruptCode);
 
 
-/**
- *
- * @param Local_u8PriorityGroup : which group the interrupt will be put in, there are 20 groups : IPR[0] ~ IPR[20
- * 								  each group can hold 4 interrupts
- * @param Local_u8PriorityLevel	: priority level within group , 0-15
- * @param Local_u8InterruptCode : interrupt ID
- */
-void NVIC_voidSetPriorityGrouping(u8 Local_u8PriorityGroup, u8 Local_u8PriorityLevel, u8 Local_u8InterruptCode);
+
+void NVIC_voidSetPriority(u8 Copy_u8InterruptPosition, u8 Copy_u8GroupPriority, u8 Copy_u8SubPriority);
 
 #endif /* NVIC_INTERFACE_H_ */

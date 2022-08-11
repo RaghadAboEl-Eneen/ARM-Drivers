@@ -2,7 +2,7 @@
  * NVIC_program.c
  *
  *  Created on: Aug 8, 2022
- *      Author: Omar Gamal
+ *      Author:  es-RaghadAly2023
  */
 
 #include "BIT_MATH.h"
@@ -12,6 +12,16 @@
 #include "NVIC_private.h"
 #include "NVIC_register.h"
 #include "NVIC_config.h"
+
+
+
+
+void NVIC_voidInit(void){
+
+	//SCB_AIRCR = NVIC_PRIORITY_DISTRIBUTION;
+}
+
+
 
 /*
  * NVIC_voidEnableInterrupt
@@ -89,4 +99,18 @@ u8 NVIC_u8GetActiveFlag(u8 Copy_u8InterruptCode) {
 	}
 
 	return Local_u8PendingFlag;
+}
+
+
+/*
+ * NVIC_voidSetPriority
+ * parameters:
+ * return value:
+ * description: Sets the priority for a specific interrupt
+ */
+void NVIC_voidSetPriority(u8 Copy_u8InterruptPosition, u8 Copy_u8GroupPriority, u8 Copy_u8SubPriority){
+
+	//NVIC_IPR[Copy_u8InterruptPosition] = (Copy_u8GroupPriority<<(4+NVIC_PRIORITY_DISTRIBUTION)) | (Copy_u8SubPriority<<4);
+	NVIC_IPR[Copy_u8InterruptPosition] = (Copy_u8GroupPriority<<(4+((NVIC_PRIORITY_DISTRIBUTION-0x05FA0300)/0x100))) | (Copy_u8SubPriority<<4);
+
 }
