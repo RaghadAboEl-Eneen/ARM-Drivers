@@ -43,9 +43,9 @@ u8 SEVENSEG_u8DisplayNumber(u8 Copy_u8Number, u8 Copy_u8SevenSegmentNumber){
 
 	u8 Local_u8ErrorState = OK;
 
-	if(Copy_u8SevenSegmentNumber == GPIO_PORTA)
+	if(Copy_u8SevenSegmentNumber == FIRST_SEVENSEG)
 		GPIO_u8SetPortSegmentValue(GPIO_PORTA, sev_seg[Copy_u8Number], 0, 7);
-	else if(Copy_u8SevenSegmentNumber == GPIO_PORTB)
+	else if(Copy_u8SevenSegmentNumber == SECOND_SEVENSEG)
 		GPIO_u8SetPortSegmentValue(GPIO_PORTB, sev_seg[Copy_u8Number], 5, 7);
 
 
@@ -83,11 +83,24 @@ u8 SEVENSEG_u8CountDown(u8 Copy_u8Number) {
 
 void SEVENSEG_voidTurnOffDisplay(u8 Copy_u8SevenSegmentNumber) {
 
-	GPIO_u8SetPortSegmentValue(Copy_u8SevenSegmentNumber, GPIO_PORT_LOW, 0, 7);
+	if(Copy_u8SevenSegmentNumber == FIRST_SEVENSEG) {
+		GPIO_u8SetPinValue(SEVENSEGMENT1_CONTORL_PORT, SEVENSEGMENT1_CONTROL_PIN, GPIO_PIN_HIGH);
+	} else if(Copy_u8SevenSegmentNumber == SECOND_SEVENSEG) {
+		GPIO_u8SetPinValue(SEVENSEGMENT2_CONTORL_PORT, SEVENSEGMENT2_CONTROL_PIN, GPIO_PIN_HIGH);
+	}
 
 }
 
 
+void SEVENSEG_voidTurnOnDisplay(u8 Copy_u8SevenSegmentNumber) {
+
+	if(Copy_u8SevenSegmentNumber == FIRST_SEVENSEG) {
+		GPIO_u8SetPinValue(SEVENSEGMENT1_CONTORL_PORT, SEVENSEGMENT1_CONTROL_PIN, GPIO_PIN_LOW);
+	} else if(Copy_u8SevenSegmentNumber == SECOND_SEVENSEG) {
+		GPIO_u8SetPinValue(SEVENSEGMENT2_CONTORL_PORT, SEVENSEGMENT2_CONTROL_PIN, GPIO_PIN_LOW);
+	}
+
+}
 
 
 
