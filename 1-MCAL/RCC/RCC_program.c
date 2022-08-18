@@ -9,6 +9,9 @@
 /* we want to initialize clock source */
 void RCC_voidInit(void) {
 
+	RCC_CR = 0;
+	RCC_CFGR = 0;
+
 /* Enabling or Disabling the clock sources */
 #if RCC_HSI_EN == ENABLE
 	SET_BIT(RCC_CR, RCC_CR_HSION);
