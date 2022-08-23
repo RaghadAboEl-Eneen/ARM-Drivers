@@ -16,6 +16,7 @@ typedef struct{
 	volatile u32 CNDTR; 				/* DMA Channel x Number of Data Register*/
 	volatile u32 CPAR; 					/* DMA Channel x Peripheral Address Register */
 	volatile u32 CMAR; 					/* DMA Channel x Memory Address Register*/
+	volatile u32 RES;
 
 }DMA_Channel_t;
 
@@ -50,6 +51,8 @@ typedef struct{
 #define CCR_TCIE	1
 #define CCR_EN		0
 
+#define IFCR_CTEIF	3
+#define IFCR_CHTIF	2
 #define IFCR_CTCIF	1
 #define IFCR_CGIF	0
 
