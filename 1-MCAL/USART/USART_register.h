@@ -37,6 +37,9 @@ typedef struct{
 #define CR1_M					12
 #define CR1_PCE					10
 #define CR1_PS					9
+#define CR1_TXEIE				7
+#define CR1_TCIE				6
+#define CR1_RXNEIE				5
 #define CR1_TE					3
 #define CR1_RE					2
 

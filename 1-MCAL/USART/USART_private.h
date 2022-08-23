@@ -12,5 +12,8 @@
 /* USART1 is in APB2*/
 /* USART2 and USART3 is in APB1 */
 
+#define IDLE			0
+#define RECEIVED		1
+#define SENDING			2
 
 #endif /* USART_PRIVATE_H_ */
