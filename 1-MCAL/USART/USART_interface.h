@@ -47,13 +47,13 @@
 void USART_voidInitUSART1(void);
 void USART_voidInitUSART2(void);
 void USART_voidInitUSART3(void);
+void USART_voidClearInterruptFlag(void);
 
 u8 USART_u8SendDataSynchronous(u8 Copy_u8Data);
 u8 USART_u8ReceiveDataSynchronous(u8 * Pointer_u8Data);
 
 void USART_voidSendDataAsynchronous(u8 Copy_u8Data);
 void USART_voidReceiveDataAsynchronous(u8 * Pointer_u8Data);
-
 
 void USART_voidEnableInterrupt(u8 Copy_u8InterruptType);
 void USART_voidDisableInterrupt(u8 Copy_u8InterruptType);

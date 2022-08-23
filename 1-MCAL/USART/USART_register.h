@@ -44,5 +44,8 @@ typedef struct{
 #define CR1_RE					2
 
 
+#define CR3_DMAT				7
+#define CR3_DMAR				6
+
 
 #endif /* USART_REGISTER_H_ */

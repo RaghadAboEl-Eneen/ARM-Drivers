@@ -15,7 +15,6 @@
 #include "USART_register.h"
 #include "USART_config.h"
 
-#include "NVIC_interface.h"
 
 u8 USART_SEND_FLAG	   = IDLE;
 u8 USART_RECEIVE_FLAG  = IDLE;
@@ -97,7 +96,7 @@ void USART_voidInitUSART1(void) {
 #if USART1_ENABLE_TX_COMPLETE_INTERRUPT == USART_ENABLE_TX_COMPLETE_INTERRUPT
 	SET_BIT(USART1_START_ADDRESS->CR1, CR1_TCIE);
 
-#elif USART1_ENABLE_TX_COMPLETE_INTERRUPT == USART2_DISABLE_TX_COMPLETE_INTERRUPT
+#elif USART1_ENABLE_TX_COMPLETE_INTERRUPT == USART_DISABLE_TX_COMPLETE_INTERRUPT
 	CLR_BIT(USART1_START_ADDRESS->CR1, CR1_TCIE);
 
 #endif
@@ -111,7 +110,16 @@ void USART_voidInitUSART1(void) {
 #endif
 
 
-	SET_BIT(USART1_START_ADDRESS->CR1, CR1_TXEIE);
+
+	//SET_BIT(USART1_START_ADDRESS->CR1, CR1_TXEIE);
+
+	/*Enable DMA for transmission*/
+	SET_BIT(USART1_START_ADDRESS->CR3, CR3_DMAT);
+
+
+
+	USART_u8SendDataSynchronous('\n');
+
 
 
 }
@@ -201,6 +209,17 @@ void USART_voidDisableInterrupt(u8 Copy_u8InterruptType) {
 	}
 
 }
+
+
+void USART_voidClearInterruptFlag(void) {
+
+
+	CLR_BIT(USART1_START_ADDRESS->SR, SR_TC);
+
+
+}
+
+
 
 void USART1_IRQHandler(void) {
 
