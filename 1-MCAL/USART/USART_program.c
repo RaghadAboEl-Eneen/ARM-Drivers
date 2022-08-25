@@ -9,6 +9,7 @@
 
 #include "STD_TYPES.h"
 #include "BIT_MATH.h"
+#include "DELAY_interface.h"
 
 #include "USART_interface.h"
 #include "USART_private.h"
@@ -118,7 +119,6 @@ void USART_voidInitUSART1(void) {
 
 
 
-	USART_u8SendDataSynchronous('\n');
 
 
 
@@ -143,6 +143,8 @@ u8 USART_u8SendDataSynchronous(u8 Copy_u8Data) {
 	while(GET_BIT(USART1_START_ADDRESS->SR, SR_TC) != 1);
 
 	CLR_BIT(USART1_START_ADDRESS->SR, SR_TC);
+
+	delay_ms(2);
 
 	return Local_u8ErrorState;
 
