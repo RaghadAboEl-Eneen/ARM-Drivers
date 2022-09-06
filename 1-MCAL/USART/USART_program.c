@@ -9,7 +9,6 @@
 
 #include "STD_TYPES.h"
 #include "BIT_MATH.h"
-#include "DELAY_interface.h"
 
 #include "USART_interface.h"
 #include "USART_private.h"
@@ -25,7 +24,7 @@ u8 USART_ReceiveBuffer = 0;
 void USART_voidInitUSART1(void) {
 
 	/* Calculate USART_DIV for needed baudrate*/
-	f32 Local_f32FractionTemp = (f32)(500000 / USART_BAUD_RATE);
+	f32 Local_f32FractionTemp = (f32)(500000.0 / (f32)USART_BAUD_RATE);
 	u16 Local_u16MantissaTemp = (u16) Local_f32FractionTemp;
 	u16 Local_u16Mask = 0x000F;
 
@@ -115,7 +114,7 @@ void USART_voidInitUSART1(void) {
 	//SET_BIT(USART1_START_ADDRESS->CR1, CR1_TXEIE);
 
 	/*Enable DMA for transmission*/
-	SET_BIT(USART1_START_ADDRESS->CR3, CR3_DMAT);
+	//SET_BIT(USART1_START_ADDRESS->CR3, CR3_DMAT);
 
 
 
@@ -140,15 +139,49 @@ u8 USART_u8SendDataSynchronous(u8 Copy_u8Data) {
 
 	USART1_START_ADDRESS->DR = Copy_u8Data;
 
-	while(GET_BIT(USART1_START_ADDRESS->SR, SR_TC) != 1);
+	while(GET_BIT(USART1_START_ADDRESS->SR, SR_TXE) != 1);
 
-	CLR_BIT(USART1_START_ADDRESS->SR, SR_TC);
+	CLR_BIT(USART1_START_ADDRESS->SR, SR_TXE);
 
-	delay_ms(2);
 
 	return Local_u8ErrorState;
 
 }
+
+
+
+
+u8 USART_u8SendArrayOfDataSynchronous(u8 * Pointer_u8Data) {
+
+	u8 Local_u8ErrorState = OK;
+	u8 Local_u8Counter = 0;
+
+	while(Pointer_u8Data[Local_u8Counter] != '\0') {
+
+		USART_u8SendDataSynchronous(Pointer_u8Data[Local_u8Counter]);
+		Local_u8Counter++;
+
+	}
+
+	return Local_u8ErrorState;
+
+}
+
+
+
+void USART_voidSendDataAsynchronous(u8 Copy_u8Data){
+
+
+	if(USART_SEND_FLAG == IDLE) {
+		USART_SEND_FLAG = SENDING;
+		USART1_START_ADDRESS->DR = Copy_u8Data;
+		USART_voidEnableInterrupt(USART_TX_BUFFER_EMPTY_INT);
+
+	}
+
+
+}
+
 
 u8 USART_u8ReceiveDataSynchronous(u8 * Pointer_u8Data) {
 
@@ -168,16 +201,109 @@ u8 USART_u8ReceiveDataSynchronous(u8 * Pointer_u8Data) {
 
 }
 
-void USART_voidSendDataAsynchronous(u8 Copy_u8Data){
+
+u8 USART_u8ReceiveDataSynchronousWithTimeout(u8 * Pointer_u8Data, u32 Copy_u32TimeuotPeriod) {
+
+	u8 Local_u8ErrorState = OK;
+	u32 Local_u32Countdown = Copy_u32TimeuotPeriod;
+
+	while( (GET_BIT(USART1_START_ADDRESS->SR, SR_RXNE) != 1) && Local_u32Countdown !=0 ) {
+		Local_u32Countdown--;
+	}
+
+	if(Local_u32Countdown > 0) {
+
+	*Pointer_u8Data = 	USART1_START_ADDRESS->DR;
+
+	//CLR_BIT(USART1_START_ADDRESS->SR, SR_RXNE);
+
+	} else if(Local_u32Countdown == 0) {
+		Local_u8ErrorState = TIMEOUT_STATE;
+	}
+
+	return Local_u8ErrorState;
 
 
-	if(USART_SEND_FLAG == IDLE) {
-		USART_SEND_FLAG = SENDING;
-		USART1_START_ADDRESS->DR = Copy_u8Data;
-		USART_voidEnableInterrupt(USART_TX_BUFFER_EMPTY_INT);
+}
+
+u8 USART_u8ReceiveArrayOfDataSynchronousWithTimeout(u8 * Pointer_u8ReceiveBuffer, u32 Copy_u32TimeoutPeriod) {
+
+	u8 Local_u8ErrorState = OK;
+	u8 Local_u8NestedErrorState = OK;
+	u8 Local_u8Counter = 0;
+
+
+	while(Local_u8NestedErrorState != TIMEOUT_STATE) {
+
+		Local_u8NestedErrorState = USART_u8ReceiveDataSynchronousWithTimeout( &(Pointer_u8ReceiveBuffer[Local_u8Counter]), Copy_u32TimeoutPeriod );
+		Local_u8Counter++;
+	}
+
+
+
+	Local_u8Counter++;
+	Pointer_u8ReceiveBuffer[Local_u8Counter] = '\0';
+
+	return Local_u8ErrorState;
+
+
+}
+
+u8 USART_u8ReceiveArrayOfDataSynchronous(u8 * Pointer_u8ReceiveBuffer, u8 Copy_u8NumberOfBytes) {
+
+	u8 Local_u8ErrorState = OK;
+	u8 Local_u8Counter = 0;
+
+	for(Local_u8Counter = 0; Local_u8Counter < Copy_u8NumberOfBytes ; Local_u8Counter++) {
+
+		USART_u8ReceiveDataSynchronous( &(Pointer_u8ReceiveBuffer[Local_u8Counter]) );
 
 	}
 
+	Pointer_u8ReceiveBuffer[Local_u8Counter] = '\0';
+
+	return Local_u8ErrorState;
+
+
+}
+
+u8 USART_u8ReceiveStringUntil(u8 * Pointer_u8ReceiveBuffer, u8 Copy_u8StopCharacter) {
+
+	u8 Local_u8ErrorState = OK;
+	u8 Local_u8Counter = 0;
+
+	USART_u8ReceiveDataSynchronous( &(Pointer_u8ReceiveBuffer[0]) );
+
+
+	while( Pointer_u8ReceiveBuffer[Local_u8Counter] != Copy_u8StopCharacter) {
+
+		Local_u8Counter++;
+		USART_u8ReceiveDataSynchronous( &(Pointer_u8ReceiveBuffer[Local_u8Counter]) );
+
+	}
+
+	Local_u8Counter++;
+	Pointer_u8ReceiveBuffer[Local_u8Counter] = '\0';
+
+
+	/*
+	if( Pointer_u8ReceiveBuffer[0] == Copy_u8StopCharacter) {
+		//nothing
+	} else {
+		Local_u8Counter++;
+
+		while( Pointer_u8ReceiveBuffer[Local_u8Counter] != Copy_u8StopCharacter) {
+
+			USART_u8ReceiveDataSynchronous( &(Pointer_u8ReceiveBuffer[Local_u8Counter]) );
+			Local_u8Counter++;
+
+		}
+	}
+
+*/
+
+
+	return Local_u8ErrorState;
 
 }
 

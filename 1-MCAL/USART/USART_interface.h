@@ -8,13 +8,13 @@
 #ifndef USART_INTERFACE_H_
 #define USART_INTERFACE_H_
 
+#define USART1_TX_PIN		GPIO_PIN9
+#define USART1_RX_PIN		GPIO_PIN10
+
 
 #define USART_TX_COMPLETE_INT					0
 #define USART_RX_BUFFER_NOT_EMPTY_INT			1
 #define USART_TX_BUFFER_EMPTY_INT				2
-
-
-
 
 #define USART_DISABLE							0
 #define USART_ENABLE							1
@@ -50,7 +50,15 @@ void USART_voidInitUSART3(void);
 void USART_voidClearInterruptFlag(void);
 
 u8 USART_u8SendDataSynchronous(u8 Copy_u8Data);
+u8 USART_u8SendArrayOfDataSynchronous(u8 * Pointer_u8Data);
+
+
 u8 USART_u8ReceiveDataSynchronous(u8 * Pointer_u8Data);
+u8 USART_u8ReceiveArrayOfDataSynchronous(u8 * Pointer_u8ReceiveBuffer, u8 Copy_u8NumberOfBytes);
+u8 USART_u8ReceiveStringUntil(u8 * Pointer_u8ReceiveBuffer, u8 Copy_u8StopCharacter);
+u8 USART_u8ReceiveArrayOfDataSynchronous(u8 * Pointer_u8ReceiveBuffer, u8 Copy_u8NumberOfBytes);
+u8 USART_u8ReceiveDataSynchronousWithTimeout(u8 * Pointer_u8Data, u32 Copy_u32TimeuotPeriod);
+u8 USART_u8ReceiveArrayOfDataSynchronousWithTimeout(u8 * Pointer_u8ReceiveBuffer, u32 Copy_u32TimeoutPeriod);
 
 void USART_voidSendDataAsynchronous(u8 Copy_u8Data);
 void USART_voidReceiveDataAsynchronous(u8 * Pointer_u8Data);
