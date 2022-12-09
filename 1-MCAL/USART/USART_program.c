@@ -21,10 +21,113 @@ u8 USART_RECEIVE_FLAG  = IDLE;
 
 u8 USART_ReceiveBuffer = 0;
 
+
+volatile USART_t * USART_base_array[3] = {USART1_START_ADDRESS, USART2_START_ADDRESS, USART3_START_ADDRESS};
+
+const USART_Config_t USART_configurations[3] = {
+
+{		USART1_BAUD_RATE,
+		USART1_ENABLE,
+		USART1_NUMBER_OF_DATA_BITS,
+		USART1_PARITY_BIT_ENABLED,
+		USART1_ENABLE_TRANSMITTER,
+		USART1_ENABLE_RECEIVER,
+		USART1_NUMBER_OF_STOP_BITS,
+		USART1_ENABLE_TX_COMPLETE_INTERRUPT,
+		USART1_ENABLE_RECEIVED_BYTE_INTERRUPT,
+		USART1_ENABLE_DMA_TX,
+		USART1_ENABLE_DMA_RX },
+
+
+{		USART2_BAUD_RATE,
+		USART2_ENABLE,
+		USART2_NUMBER_OF_DATA_BITS,
+		USART2_PARITY_BIT_ENABLED,
+		USART2_ENABLE_TRANSMITTER,
+		USART2_ENABLE_RECEIVER,
+		USART2_NUMBER_OF_STOP_BITS,
+		USART2_ENABLE_TX_COMPLETE_INTERRUPT,
+		USART2_ENABLE_RECEIVED_BYTE_INTERRUPT,
+		USART2_ENABLE_DMA_TX,
+		USART2_ENABLE_DMA_RX },
+
+{		USART3_BAUD_RATE,
+		USART3_ENABLE,
+		USART3_NUMBER_OF_DATA_BITS,
+		USART3_PARITY_BIT_ENABLED,
+		USART3_ENABLE_TRANSMITTER,
+		USART3_ENABLE_RECEIVER,
+		USART3_NUMBER_OF_STOP_BITS,
+		USART3_ENABLE_TX_COMPLETE_INTERRUPT,
+		USART3_ENABLE_RECEIVED_BYTE_INTERRUPT,
+		USART3_ENABLE_DMA_TX,
+		USART3_ENABLE_DMA_RX }
+
+};
+
+void USART_voidInit(void) {
+
+	u32 Local_u32CR1_Buffer = 0x00000000;
+	u32 Local_u32CR2_Buffer = 0x00000000;
+	u32 Local_u32CR3_Buffer = 0x00000000;
+
+	u8 Local_u8Counter = 0;
+
+	for (Local_u8Counter = 0; Local_u8Counter < 3; Local_u8Counter++) {
+
+
+		/* Calculate USART_DIV for needed baudrate*/
+		f32 Local_f32FractionTemp = (f32)(500000.0 / (f32)USART_configurations[Local_u8Counter].baudrate);
+		u16 Local_u16MantissaTemp = (u16) Local_f32FractionTemp;
+		u16 Local_u16Mask = 0x000F;
+
+		USART_base_array[Local_u8Counter]->BRR &= Local_u16Mask;
+		USART_base_array[Local_u8Counter]->BRR |= Local_u16MantissaTemp << BRR_DIV_MANTISSA;
+
+		Local_f32FractionTemp = (f32)(Local_f32FractionTemp - Local_u16MantissaTemp);
+		Local_f32FractionTemp = Local_f32FractionTemp * 16.0 ;
+
+		Local_u16Mask = 0xFFF0;
+
+		USART_base_array[Local_u8Counter]->BRR &= Local_u16Mask;
+		USART_base_array[Local_u8Counter]->BRR |= ((u16)Local_f32FractionTemp) << BRR_DIV_FRACTION;
+
+
+		Local_u32CR1_Buffer = 0x00000000;
+		Local_u32CR2_Buffer = 0x00000000;
+		Local_u32CR3_Buffer = 0x00000000;
+
+		USART_base_array[Local_u8Counter]->CR1 = 0x00000000;
+		USART_base_array[Local_u8Counter]->CR2 = 0x00000000;
+		USART_base_array[Local_u8Counter]->CR3 = 0x00000000;
+
+		Local_u32CR1_Buffer|= USART_configurations[Local_u8Counter].ue 		<< CR1_UE;
+		Local_u32CR1_Buffer|= USART_configurations[Local_u8Counter].m 		<<  CR1_M;
+		Local_u32CR1_Buffer|= USART_configurations[Local_u8Counter].pce 	<< CR1_PCE;
+		Local_u32CR1_Buffer|= USART_configurations[Local_u8Counter].tcie 	<< CR1_TCIE;
+		Local_u32CR1_Buffer|= USART_configurations[Local_u8Counter].rxneie 	<< CR1_RXNEIE;
+		Local_u32CR1_Buffer|= USART_configurations[Local_u8Counter].te 		<< CR1_TE;
+		Local_u32CR1_Buffer|= USART_configurations[Local_u8Counter].re 		<< CR1_RE;
+
+		Local_u32CR2_Buffer|= USART_configurations[Local_u8Counter].stop	<< CR2_STOP;
+
+		Local_u32CR3_Buffer|= USART_configurations[Local_u8Counter].dmat 	<< CR3_DMAT;
+		Local_u32CR3_Buffer|= USART_configurations[Local_u8Counter].dmar 	<< CR3_DMAR;
+
+		USART_base_array[Local_u8Counter]->CR1 = Local_u32CR1_Buffer;
+		USART_base_array[Local_u8Counter]->CR2 = Local_u32CR1_Buffer;
+		USART_base_array[Local_u8Counter]->CR3 = Local_u32CR3_Buffer;
+
+	}
+
+}
+
+
+
 void USART_voidInitUSART1(void) {
 
 	/* Calculate USART_DIV for needed baudrate*/
-	f32 Local_f32FractionTemp = (f32)(500000.0 / (f32)USART_BAUD_RATE);
+	f32 Local_f32FractionTemp = (f32)(500000.0 / (f32)USART1_BAUD_RATE);
 	u16 Local_u16MantissaTemp = (u16) Local_f32FractionTemp;
 	u16 Local_u16Mask = 0x000F;
 
@@ -113,24 +216,16 @@ void USART_voidInitUSART1(void) {
 
 	//SET_BIT(USART1_START_ADDRESS->CR1, CR1_TXEIE);
 
-	/*Enable DMA for transmission*/
-	//SET_BIT(USART1_START_ADDRESS->CR3, CR3_DMAT);
+	/*Enable DMA for transmission */
+	SET_BIT(USART1_START_ADDRESS->CR3, CR3_DMAT);
 
-
-
+	/*Enable DMA for reception */
+	SET_BIT(USART1_START_ADDRESS->CR3, CR3_DMAR);
 
 
 
 }
 
-void USART_voidInitUSART2(void) {
-
-
-}
-
-void USART_voidInitUSART3(void) {
-
-}
 
 u8 USART_u8SendDataSynchronous(u8 Copy_u8Data) {
 

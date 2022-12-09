@@ -9,6 +9,31 @@
 #define USART_PRIVATE_H_
 
 
+typedef struct{
+
+	u16 baudrate;
+	u8 ue;
+	u8 m;
+	u8 pce;
+	u8 te;
+	u8 re;
+	u8 stop;
+	u8 tcie;
+	u8 rxneie;
+	u8 dmat;
+	u8 dmar;
+
+
+
+
+
+}USART_Config_t;
+
+
+
+
+
+
 /* USART1 is in APB2*/
 /* USART2 and USART3 is in APB1 */
 

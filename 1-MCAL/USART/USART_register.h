@@ -23,8 +23,8 @@ typedef struct{
 }USART_t;
 
 #define USART1_START_ADDRESS    ((volatile USART_t*) 0x40013800)
-#define USART2_START_ADDRESS    ((volatile USART_t*) 0x40014400)
-#define USART3_START_ADDRESS    ((volatile USART_t*) 0x40014800)
+#define USART2_START_ADDRESS    ((volatile USART_t*) 0x40004400)
+#define USART3_START_ADDRESS    ((volatile USART_t*) 0x40004800)
 
 #define SR_TXE				    7			/* Transmit Data Register Empty*/
 #define SR_TC				    6			/* Transmission Complete */
@@ -43,6 +43,7 @@ typedef struct{
 #define CR1_TE					3
 #define CR1_RE					2
 
+#define CR2_STOP				12
 
 #define CR3_DMAT				7
 #define CR3_DMAR				6

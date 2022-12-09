@@ -44,6 +44,7 @@
 #define USART_ENABLE_RECEIVED_BYTE_INTERRUPT	1
 
 
+void USART_voidInit(void);
 void USART_voidInitUSART1(void);
 void USART_voidInitUSART2(void);
 void USART_voidInitUSART3(void);
